@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Андрей Долинный — Разработка сайтов и digital-решений</title>
+<style>
+  :root {
+    --bg: #f8fafc; --white: #ffffff; --navy: #0f172a; --navy-light: #334155;
+    --accent: #d4af37; --accent-hover: #b5952f; --border: #e2e8f0;
+    --shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    --shadow-hover: 0 20px 40px rgba(15, 23, 42, 0.1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--navy); line-height: 1.7; overflow-x: hidden; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+  @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .reveal.active { opacity: 1; transform: translateY(0); }
+
+  .nav-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 1001; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(3px); }
+  .nav-overlay.open { opacity: 1; pointer-events: all; }
+  .side-menu { position: fixed; top: 0; right: -350px; width: 320px; height: 100vh; background: var(--white); z-index: 1002; transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1); padding: 80px 40px; box-shadow: -10px 0 40px rgba(0,0,0,0.1); }
+  .side-menu.open { right: 0; }
+  .side-menu ul { list-style: none; }
+  .side-menu li { margin-bottom: 30px; }
+  .side-menu a { color: var(--navy); text-decoration: none; font-size: 22px; font-weight: 600; transition: color 0.3s, padding-left 0.3s; display: block; }
+  .side-menu a:hover { color: var(--accent); padding-left: 10px; }
+  .side-menu .close-btn { position: absolute; top: 25px; right: 25px; background: none; border: none; color: var(--navy); font-size: 32px; cursor: pointer; transition: transform 0.3s; }
+  .side-menu .close-btn:hover { transform: rotate(90deg); }
+
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid transparent; transition: all 0.3s ease; }
+  header.scrolled { background: rgba(255, 255, 255, 0.95); border-bottom: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); padding: 15px 50px; }
+  header .logo-text { display: flex; flex-direction: column; line-height: 1.2; }
+  header .logo-text .name { font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
+  header .logo-text .title { font-size: 12px; color: var(--navy-light); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 2px; }
+  .burger { color: var(--navy); font-size: 32px; cursor: pointer; background: none; border: none; transition: color 0.3s; }
+  .burger:hover { color: var(--accent); }
+
+  section { padding: 120px 20px; position: relative; }
+  .container { max-width: 1150px; margin: 0 auto; position: relative; z-index: 2; }
+  .section-title { font-size: 42px; color: var(--navy); margin-bottom: 20px; font-weight: 800; letter-spacing: -1px; }
+  .section-title span { color: var(--accent); }
+  .section-sub { font-size: 19px; color: var(--navy-light); margin-bottom: 60px; max-width: 700px; }
+
+  /* БЛОК 1: Hero */
+  #hero { min-height: 100vh; display: flex; align-items: center; padding-top: 140px; background: radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(15, 23, 42, 0.02) 0%, transparent 40%); }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 80px; align-items: center; }
+  .hero-text h1 { font-size: 56px; line-height: 1.1; color: var(--navy); margin-bottom: 28px; animation: fadeUp 1s ease both; letter-spacing: -1.5px; }
+  .hero-text h1 .accent { color: var(--accent); position: relative; display: inline-block; }
+  .hero-text h1 .accent::after { content: ''; position: absolute; bottom: 5px; left: 0; width: 100%; height: 10px; background: rgba(212, 175, 55, 0.2); z-index: -1; border-radius: 4px; }
+  .hero-text p { font-size: 20px; color: var(--navy-light); margin-bottom: 45px; animation: fadeUp 1s ease 0.2s both; max-width: 90%; }
+  .hero-badge { display: inline-block; background: var(--white); border: 1px solid var(--border); color: var(--navy); padding: 10px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; margin-bottom: 25px; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); animation: fadeUp 1s ease 0.1s both; }
+  .btn-main { display: inline-block; background: var(--navy); color: var(--white); padding: 20px 50px; font-size: 18px; font-weight: 700; text-decoration: none; border-radius: 8px; border: none; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); animation: fadeUp 1s ease 0.4s both, pulseRing 3s infinite 1.5s; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2); }
+  .btn-main:hover { background: var(--accent); color: var(--navy); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4); }
+  .hero-photo { position: relative; display: flex; justify-content: center; animation: fadeIn 1.2s ease 0.5s both; }
+  .hero-photo img { width: 100%; max-width: 420px; border-radius: 24px; object-fit: cover; box-shadow: 0 30px 60px rgba(15, 23, 42, 0.15); animation: float 6s ease-in-out infinite; position: relative; z-index: 2; }
+  .hero-photo::before { content: ''; position: absolute; top: 20px; left: 20px; right: -20px; bottom: -20px; border: 3px solid var(--accent); border-radius: 24px; z-index: 1; transition: all 0.5s ease; }
+  .hero-photo:hover::before { top: 15px; left: 15px; right: -15px; bottom: -15px; }
+
+  /* БЛОК 2: Проблемы */
+  #problems { background: var(--white); border-top: 1px solid var(--border); }
+  .problems-list { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+  .problems-list li { background: var(--bg); padding: 35px 40px; border-radius: 16px; border-left: 4px solid transparent; font-size: 18px; color: var(--navy); display: flex; align-items: flex-start; gap: 20px; transition: all 0.4s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.02); position: relative; overflow: hidden; }
+  .problems-list li::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); transform: scaleY(0); transform-origin: bottom; transition: transform 0.4s ease; }
+  .problems-list li:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08); background: var(--white); border-color: var(--border); }
+  .problems-list li:hover::before { transform: scaleY(1); }
+  .problems-list li .icon { color: var(--accent); font-size: 26px; font-weight: 800; line-height: 1.2; min-width: 30px; text-align: center; }
+  .problems-list li:last-child { grid-column: 1 / -1; }
+
+  /* БЛОК 3: Услуги */
+  #services { background: var(--bg); }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  .service-card { background: var(--white); padding: 40px 30px; border-radius: 16px; border: 1px solid var(--border); transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+  .service-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+  .service-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: transparent; }
+  .service-card:hover::after { transform: scaleX(1); }
+  .service-card.wide { grid-column: 1 / -1; display: flex; align-items: center; gap: 30px; padding: 30px 40px; }
+  .service-card.wide .service-icon-img { margin-bottom: 0; }
+  .service-card.wide h3 { margin-bottom: 5px; }
+  .service-card h3 { font-size: 22px; color: var(--navy); margin-bottom: 15px; font-weight: 700; }
+  .service-card p { font-size: 16px; color: var(--navy-light); line-height: 1.6; }
+  .service-icon-img { width: 64px; height: 64px; object-fit: contain; margin-bottom: 20px; transition: transform 0.3s ease, filter 0.3s ease; filter: brightness(0) saturate(100%) invert(11%) sepia(19%) saturate(1261%) hue-rotate(181deg) brightness(95%) contrast(95%); }
+  .service-card:hover .service-icon-img { transform: scale(1.1) rotate(5deg); filter: brightness(0) saturate(100%) invert(77%) sepia(45%) saturate(586%) hue-rotate(359deg) brightness(87%) contrast(88%); }
+
+  /* БЛОК 4: От А до Я */
+  #about-work { background: var(--navy); position: relative; overflow: hidden; padding: 120px 20px; }
+  #about-work::before { content: ''; position: absolute; top: -50%; left: -20%; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%); animation: float 8s ease-in-out infinite; }
+  .about-work-inner { text-align: center; position: relative; z-index: 2; }
+
+  /* БЛОК 5: Портфолио */
+  #portfolio { background: var(--white); }
+  .portfolio-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; }
+  .portfolio-card { text-decoration: none; background: var(--bg); border-radius: 20px; overflow: hidden; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); border: 1px solid var(--border); display: flex; flex-direction: column; }
+  .portfolio-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); border-color: var(--accent); }
+  .portfolio-img { height: 240px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .portfolio-emoji { font-size: 80px; transition: transform 0.4s ease; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); }
+  .portfolio-card:hover .portfolio-emoji { transform: scale(1.2) rotate(5deg); }
+  .portfolio-info { padding: 30px; background: var(--white); flex: 1; }
+  .portfolio-info h3 { font-size: 22px; color: var(--navy); margin-bottom: 10px; font-weight: 700; }
+  .portfolio-info p { font-size: 16px; color: var(--navy-light); }
+
+  /* БЛОК 6: Форма заявки */
+  #contact { background: var(--bg); }
+  .contact-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; background: var(--white); padding: 60px; border-radius: 24px; box-shadow: var(--shadow); }
+  .contact-text .section-title { font-size: 36px; margin-bottom: 20px; }
+  .contact-text p { font-size: 18px; color: var(--navy-light); margin-bottom: 30px; }
+  .contact-list { list-style: none; }
+  .contact-list li { font-size: 17px; margin-bottom: 15px; color: var(--navy); font-weight: 600; }
+  .contact-form .form-group { margin-bottom: 20px; }
+  .contact-form label { display: block; font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .contact-form input, .contact-form textarea { width: 100%; padding: 15px 20px; border: 2px solid var(--border); border-radius: 10px; font-size: 16px; font-family: inherit; transition: border-color 0.3s, box-shadow 0.3s; background: var(--bg); }
+  .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1); background: var(--white); }
+  .form-success { display: none; text-align: center; padding: 40px; background: #dcfce7; color: #166534; border-radius: 16px; font-size: 20px; font-weight: 600; margin-top: 40px; border: 2px solid #bbf7d0; }
+
+  /* БЛОК 7: Футер */
+  footer { background: var(--navy); color: var(--white); padding: 80px 20px 40px; text-align: center; }
+  .footer-content { max-width: 800px; margin: 0 auto; }
+  .footer-logo { font-size: 28px; font-weight: 800; margin-bottom: 15px; letter-spacing: -0.5px; }
+  .footer-desc { font-size: 18px; color: rgba(255,255,255,0.7); margin-bottom: 40px; }
+  .footer-contacts { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-bottom: 40px; }
+  .footer-contacts a { color: var(--white); text-decoration: none; font-size: 18px; font-weight: 600; transition: color 0.3s, transform 0.3s; display: flex; align-items: center; gap: 8px; }
+  .footer-contacts a:hover { color: var(--accent); transform: translateY(-3px); }
+  .footer-copy { font-size: 14px; color: rgba(255,255,255,0.4); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; }
+
+  @media (max-width: 900px) {
+    header { padding: 15px 20px; }
+    header.scrolled { padding: 12px 20px; }
+    .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 50px; }
+    .hero-text p { margin-left: auto; margin-right: auto; }
+    .hero-photo { order: -1; }
+    .hero-photo::before { display: none; }
+    .hero-text h1 { font-size: 38px; }
+    .hero-text p { font-size: 18px; }
+    .section-title { font-size: 32px; }
+    section { padding: 80px 20px; }
+    .problems-list { grid-template-columns: 1fr; }
+    .btn-main { padding: 18px 40px; font-size: 17px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card.wide { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .portfolio-img { height: 200px; }
+    .contact-wrapper { grid-template-columns: 1fr; padding: 30px; gap: 40px; }
+    .contact-text .section-title { font-size: 28px; }
+    .footer-contacts { flex-direction: column; gap: 15px; }
+    footer { padding: 60px 20px 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-overlay" id="navOverlay" onclick="toggleMenu()"></div>
+<div class="side-menu" id="sideMenu">
+  <button class="close-btn" onclick="toggleMenu()">×</button>
+  <ul>
+    <li><a href="#hero" onclick="toggleMenu()">Главная</a></li>
+    <li><a href="#problems" onclick="toggleMenu()">Проблемы</a></li>
+    <li><a href="#services" onclick="toggleMenu()">Услуги</a></li>
+    <li><a href="#portfolio" onclick="toggleMenu()">Портфолио</a></li>
+    <li><a href="#contact" onclick="toggleMenu()">Контакты</a></li>
+  </ul>
+</div>
+
+<header id="header">
+  <div class="logo-text">
+    <span class="name">Андрей Долинный</span>
+    <span class="title">Digital-разработчик</span>
+  </div>
+  <button class="burger" onclick="toggleMenu()">☰</button>
+</header>
+
+<!-- БЛОК 1: Главная -->
+<section id="hero">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <div class="hero-badge">Digital-решения под ключ</div>
+      <h1>Воплощу вашу <span class="accent">идею</span> в готовый цифровой продукт за 7 дней</h1>
+      <p>От разработки лендинга до сложной CRM-системы. Делаю сайты, которые решают бизнес-задачи, а не просто висят в интернете.</p>
+      <a href="#problems" class="btn-main">Узнать подробнее</a>
+    </div>
+    <div class="hero-photo">
+      <img src="https://i.ibb.co/wN9bdRTb/74t-BO-hec-Y73-D3-PJeaf-Iyigq-Dmm-KMbfpk8k7nc-G6ku-Ts-Unuzk5-SXpdav-Gj-OYy5a7-Zytdep-OW8-Oz-JY0bu-NOOu-I.jpg" alt="Андрей Долинный">
+    </div>
+  </div>
+</section>
+
+<!-- БЛОК 2: Проблемы клиента -->
+<section id="problems">
+  <div class="container">
+    <h2 class="section-title reveal">Знакомая ситуация? <span>Давайте это исправим.</span></h2>
+    <p class="section-sub reveal">Я знаю, с какими трудностями сталкиваются предприниматели и эксперты при запуске проектов в digital.</p>
+    <ul class="problems-list">
+      <li class="reveal"><span class="icon">!</span><div>Создание сайта затягивается на месяцы, а результата всё нет.</div></li>
+      <li class="reveal"><span class="icon">₽</span><div>Дизайнеры берут большие деньги, но не дают того самого «вау-эффекта», который приносит клиентов.</div></li>
+      <li class="reveal"><span class="icon">⏳</span><div>Разработчики выставляют неподъемные чеки и затягивают сроки.</div></li>
+      <li class="reveal"><span class="icon">↓</span><div>Существующие проекты не конвертируют посетителей в клиентов и не приносят прибыль.</div></li>
+      <li class="reveal"><span class="icon">?</span><div>Идей много, но непонятно, как всё это собрать в единый работающий проект для ваших клиентов.</div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- БЛОК 3: Задачи и проекты -->
+<section id="services">
+  <div class="container">
+    <h2 class="section-title reveal">Что я могу <span>сделать для вас</span> за 7 дней</h2>
+    <p class="section-sub reveal">Готовые решения под ключ — от простых лендингов до сложных систем управления.</p>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <img class="service-icon-img" src="https://cdn-icons-png.flaticon.com/512/2913/2913982.png" alt="Лендинг">
+        <h3>Лендинг для компании</h3>
+        <p>Продающая страница для вашего бизнеса или эксперта. Привлекает клиентов и доносит суть предложения.</p>
+      </div>
+      <div class="service-card reveal">
+        <img class="service-icon-img" src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png" alt="Сайт">
+        <h3>Многостраничный сайт</h3>
+        <p>Полноценный сайт с разделами, подробной информацией и удобной навигацией для ваших клиентов.</p>
+      </div>
+      <div class="service-card reveal">
+        <img class="service-icon-img" src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" alt="Магазин">
+        <h3>Интернет-магазин</h3>
+        <p>Сайт с каталогом товаров и корзиной покупателя. Всё для удобной онлайн-торговли.</p>
+      </div>
+      <div class="service-card reveal">
+        <img class="service-icon-img" src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="CRM">
+        <h3>CRM-система</h3>
+        <p>Удобная система управления для вашего бизнеса. Адаптированная под вашу специфику и задачи.</p>
+      </div>
+      <div class="service-card reveal">
+        <img class="service-icon-img" src="https://cdn-icons-png.flaticon.com/512/2889/2889676.png" alt="Админ-панель">
+        <h3>Админ-панель</h3>
+        <p>Панель управления с разделением ролей (клиент / сотрудник / администратор) для контроля процессов.</p>
+      </div>
+      <div class="service-card reveal">
+        <img class="service-icon-img" src="https://cdn-icons-png.flaticon.com/512/2693/2693507.png" alt="Запись на услуги">
+        <h3>Сайт с записью на услуги</h3>
+        <p>Функционал онлайн-записи и ведения клиентской базы. Идеально для сферы услуг.</p>
+      </div>
+      <div class="service-card wide reveal">
+        <img class="service-icon-img" src="https://cdn-icons-png.flaticon.com/512/2950/2950669.png" alt="Интеграции">
+        <h3>Интеграции и сервисы</h3>
+        <p>Подключение любых сторонних сервисов, оплат, мессенджеров и API к вашим проектам.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- БЛОК 4: От А до Я -->
+<section id="about-work">
+  <div class="container">
+    <div class="about-work-inner reveal">
+      <h2 class="section-title" style="color: var(--white); margin-bottom: 25px;">Разработаю проект <span>с нуля</span> или доведу до совершенства</h2>
+      <p style="font-size: 20px; color: rgba(255,255,255,0.8); max-width: 800px; margin: 0 auto; line-height: 1.8;">
+        Могу разработать всё с полного нуля от А до Я, либо дополнить ваш уже существующий проект до совершенства. Главная цель — чтобы он приносил вам максимальную прибыль и работал как часы.
+      </p>
+    </div>
+  </div>
+</section>
+<!-- БЛОК 5: Портфолио -->
+<section id="portfolio">
+  <div class="container">
+    <h2 class="section-title reveal">Мои <span>работы</span></h2>
+    <p class="section-sub reveal">Примеры проектов, которые уже приносят пользу моим клиентам.</p>
+    <div class="portfolio-grid">
+      <a href="https://adg1963.github.io/afrodita/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #fce4ec; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/6csNSmyN/1.png" alt="Салон «Афродита»" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Салон красоты «Афродита»</h3><p>Сайт с онлайн-записью и галереей работ</p></div>
+      </a>
+      <a href="https://adg1963.github.io/osminog/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #e0f2fe; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/mrMhg2Lv/2.png" alt="Магазин «Осьминог»" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Магазин «Осьминог»</h3><p>Интернет-магазин морепродуктов с корзиной</p></div>
+      </a>
+      <a href="https://adg1963.github.io/coffee-house/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #fef3c7; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/1fSf4SXH/3.png" alt="Кофейня" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Кофейня «С теплом и Уютом»</h3><p>Сайт кофейни с меню и адресами</p></div>
+      </a>
+      <a href="https://adg1963.github.io/crm-school/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #dcfce7; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/fYNzZpt0/4.png" alt="Онлайн-школа" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Онлайн-школа по питанию</h3><p>CRM-система для управления онлайн-школой</p></div>
+      </a>
+      <a href="https://adg1963.github.io/ai-news-admin/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #e0e7ff; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/qK4cBrT/5.jpg" alt="Админ-панель" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Административная панель</h3><p>Панель управления с разделением ролей</p></div>
+      </a>
+      <a href="https://adg1963.github.io/moy-den/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #fce7f3; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/5h7t37SR/6.png" alt="Трекер привычек" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Трекер привычек и планер</h3><p>Приложение для планирования задач</p></div>
+      </a>
+      <a href="https://adg1963.github.io/psyholog-sait---novyi/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #f3e8ff; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/rDX1hx6/7.png" alt="Сайт психолога" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Сайт психолога</h3><p>Личный сайт с записью на консультацию</p></div>
+      </a>
+      <a href="https://adg1963.github.io/foreign-languages/" target="_blank" class="portfolio-card reveal">
+        <div class="portfolio-img" style="background: #ffedd5; padding: 0; overflow: hidden;">
+          <img src="https://i.ibb.co/Z6yQGqkp/8.png" alt="Эксперт по языкам" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+        </div>
+        <div class="portfolio-info"><h3>Эксперт по языкам</h3><p>Сайт преподавателя иностранных языков</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- БЛОК 6: Форма заявки -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-wrapper reveal">
+      <div class="contact-text">
+        <h2 class="section-title">Готовы обсудить <span>ваш проект?</span></h2>
+        <p>Оставьте заявку, и я свяжусь с вами в течение дня, чтобы обсудить детали, сроки и стоимость.</p>
+        <ul class="contact-list">
+          <li>✅ Бесплатная консультация</li>
+          <li>✅ Оценка проекта за 1 день</li>
+          <li>✅ Работа под ключ</li>
+        </ul>
+      </div>
+      <form class="contact-form" onsubmit="return sendForm(event)">
+        <div class="form-group">
+          <label>Ваше имя</label>
+          <input type="text" id="clientName" placeholder="Как к вам обращаться" required>
+        </div>
+        <div class="form-group">
+          <label>Телефон или e-mail</label>
+          <input type="text" id="clientContact" placeholder="+7 ... или почта" required>
+        </div>
+        <div class="form-group">
+          <label>Опишите вашу задачу</label>
+          <textarea id="clientTask" rows="3" placeholder="Кратко о том, что нужно сделать" required></textarea>
+        </div>
+        <button type="submit" class="btn-main" style="width: 100%; animation: none;">Отправить запрос</button>
+      </form>
+    </div>
+    <div class="form-success" id="successMsg">
+      ✅ Спасибо! Ваша заявка принята. Я свяжусь с вами в ближайшее время.
+    </div>
+  </div>
+</section>
+
+<!-- БЛОК 7: Футер -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-logo">Андрей Долинный</div>
+    <p class="footer-desc">Digital-разработчик. Создаю сайты и сервисы, которые приносят прибыль.</p>
+    <div class="footer-contacts">
+      <a href="tel:+79803253275">📞 +7 980 325-32-75</a>
+      <a href="mailto:doliandrej@yandex.ru">✉️ doliandrej@yandex.ru</a>
+      <a href="https://t.me/AndreDoli" target="_blank">✈️ Telegram</a>
+    </div>
+    <div class="footer-copy">
+      © 2026 Андрей Долинный. Все права защищены.
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Анимация появления при скролле
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Меню
+  function toggleMenu() {
+    document.getElementById('sideMenu').classList.toggle('open');
+    document.getElementById('navOverlay').classList.toggle('open');
+  }
+
+  // Эффект шапки при скролле
+  window.addEventListener('scroll', () => {
+    const header = document.getElementById('header');
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+
+  // Отправка формы
+  function sendForm(e) {
+    e.preventDefault();
+    document.querySelector('.contact-form').style.display = 'none';
+    document.querySelector('.contact-text').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+    return false;
+  }
+</script>
+
+</body>
+</html>
